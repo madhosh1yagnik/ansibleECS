@@ -10,8 +10,10 @@
     - name: Cluster creation
       community.aws.ecs_cluster:
         name: ecs_demoCLuster
-        access_key: AKIAVNADRKRRZWBTEUWA
-        aws_secret_key: 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
+          #access_key:
+          #AKIAVNADRKRRZWBTEUWA
+          #aws_secret_key: 
+          #YxOdBKKSkPR6u7Vs+YeYiy4fgVZkSmxwxi5fhrOB
         aws_region: ap-south-1
         state: present
 
