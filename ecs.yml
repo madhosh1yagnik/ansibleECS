@@ -18,20 +18,21 @@
     - name: Create task definition
       community.aws.ecs_taskdefinition:
         family: ecs_website
+        execution_role_arn: "arn:aws:iam::371522098275:role/loadbal"
         containers:
         - name: ecs
           essential: true
-          image: "uri:71522098275.dkr.ecr.ap-south-1.amazonaws.com/django-demo-anisble:latest"
+          image: "371522098275.dkr.ecr.ap-south-1.amazonaws.com/django-demo-anisble:latest"          
           portMappings:
           - containerPort: 3000
-            hostPort: 3000
+            hostPort:      3000
         launch_type: FARGATE
-        cpu: 256
-        memory: 512
-        execution_role_arn: "arn:aws:iam::371522098275:role/ECRECSFULLIAM"
+        cpu: 512
+        memory: 1024
         state: present
         region: ap-south-1
         network_mode: awsvpc
+
 
     - name: Modify the target group with a custom health check
       community.aws.elb_target_group:
