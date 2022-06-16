@@ -1,0 +1,16 @@
+- name: ecr-repo
+  #hosts: web
+  #remote_user: ubuntu
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tags: provisioning
+
+  tasks:
+    - name: create ecr
+      community.aws.ecs_ecr:
+        name: django-demo-anisble
+        aws_region: ap-south-1
+          #aws_access_key: AKIASUMDLUQTVLV2UZH2
+          #aws_secret_key: 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
+

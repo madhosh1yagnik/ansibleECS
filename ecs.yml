@@ -1,0 +1,91 @@
+- name: ecs-demo
+  #hosts: web
+  #remote_user: ubuntu
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tags: provisioning
+
+  tasks:
+    - name: Cluster creation
+      community.aws.ecs_cluster:
+        name: ecs_demoCLuster
+        access_key: AKIAVNADRKRRZWBTEUWA
+        aws_secret_key: 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
+        aws_region: ap-south-1
+        state: present
+
+    - name: Create task definition
+      community.aws.ecs_taskdefinition:
+        family: ecs_website
+        containers:
+        - name: ecs
+          essential: true
+          image: "uri:71522098275.dkr.ecr.ap-south-1.amazonaws.com/django-demo-anisble:latest"
+          portMappings:
+          - containerPort: 3000
+            hostPort: 3000
+        launch_type: FARGATE
+        cpu: 256
+        memory: 512
+        execution_role_arn: "arn:aws:iam::371522098275:role/ECRECSFULLIAM"
+        state: present
+        region: ap-south-1
+        network_mode: awsvpc
+
+    - name: Modify the target group with a custom health check
+      community.aws.elb_target_group:
+        name: mytargetgroup
+        protocol: http
+        port: 80
+        vpc_id: vpc-08276783648ee9d50        
+        health_check_protocol: http
+        region: ap-south-1
+        health_check_path: /health_check
+        health_check_port: 80
+        successful_response_codes: 200
+        health_check_interval: 15
+        health_check_timeout: 3
+        healthy_threshold_count: 4
+        unhealthy_threshold_count: 3
+        state: present
+
+
+
+
+    - community.aws.ecs_service:
+        state: present
+        name: console-test-service
+        cluster: ecs_demoCLuster 
+        task_definition: 'ecs_website'
+        desired_count: 0
+        region: ap-south-1
+        network_configuration:
+          subnets:
+          - subnet-0ce22834c799341df	
+          security_groups:
+          - AnsibleSG
+
+
+
+
+
+    - community.aws.elb_application_lb:
+        name: myelb
+        region: ap-south-1
+        security_groups:
+          - sg-00fd837e92eb849bd
+          - sg-052fd6a86defa50c7
+        subnets:
+          - subnet-0ce22834c799341df
+          - subnet-034dc2ec521f3b1e4
+        listeners:
+          - Protocol: HTTP
+            Port: 80 
+              #SslPolicy: ELBSecurityPolicy-2015-05
+              #Certificates: 
+              #- CertificateArn: arn:aws:elasticloadbalancing:ap-south-1:371522098275:listener/app/myelb/6b4f915ca6a77550/8a9c0c2c4ddd3f5a
+            DefaultActions:
+              - Type: forward 
+                TargetGroupName: mytargetgroup 
+        state: present
