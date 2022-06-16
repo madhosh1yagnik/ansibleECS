@@ -5,15 +5,23 @@
   connection: local
   gather_facts: False
   tags: provisioning
+  vars_prompt:
+
+    - name: accessKey
+      prompt: What is your aws access key?
+      private: no
+
+    - name: secretKey
+      prompt: What is your secret key?
 
   tasks:
     - name: Cluster creation
       community.aws.ecs_cluster:
         name: ecs_demoCLuster
-          #access_key:
-          #AKIAVNADRKRRZWBTEUWA
-          #aws_secret_key: 
-          #YxOdBKKSkPR6u7Vs+YeYiy4fgVZkSmxwxi5fhrOB
+        access_key: "{{accessKey}}"
+          #enter your access key on prompt
+        aws_secret_key: "{{secretKey}}"
+          #enter secret key for your aws account on prompt
         aws_region: ap-south-1
         state: present
 
